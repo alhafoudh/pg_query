@@ -19,28 +19,28 @@ unless File.exist?("#{workdir}/libpg_query.tar.gz")
 end
 
 unless Dir.exist?(libdir)
-  system("tar -xf #{workdir}/libpg_query.tar.gz") || raise('ERROR')
+  system("tar -xf \"#{workdir}/libpg_query.tar.gz\"") || raise('ERROR')
 end
 
 unless Dir.exist?(libfile)
   # Build libpg_query (and parts of PostgreSQL)
-  system("cd #{libdir}; #{ENV['MAKE'] || (RUBY_PLATFORM =~ /bsd/ ? 'gmake' : 'make')} build")
+  system("cd \"#{libdir}\"; #{ENV['MAKE'] || (RUBY_PLATFORM =~ /bsd/ ? 'gmake' : 'make')} build")
 end
 
 # Copy test files (this intentionally overwrites existing files!)
-system("cp #{libdir}/testdata/* #{gemdir}/spec/files/")
+system("cp \"#{libdir}/testdata/*\" \"#{gemdir}/spec/files/\"")
 
 $objs = ['pg_query_ruby.o']
 
 $LOCAL_LIBS << '-lpg_query'
 $LIBPATH << libdir
-$CFLAGS << " -I #{libdir} -O3 -Wall -fno-strict-aliasing -fwrapv -g"
+$CFLAGS << " -I \"#{libdir}\" -O3 -Wall -fno-strict-aliasing -fwrapv -g"
 
 SYMFILE = File.join(File.dirname(__FILE__), 'pg_query_ruby.sym')
 if RUBY_PLATFORM =~ /darwin/
-  $DLDFLAGS << " -Wl,-exported_symbols_list #{SYMFILE}" unless defined?(::Rubinius)
+  $DLDFLAGS << " -Wl,-exported_symbols_list \"#{SYMFILE}\"" unless defined?(::Rubinius)
 else
-  $DLDFLAGS << " -Wl,--retain-symbols-file=#{SYMFILE}"
+  $DLDFLAGS << " -Wl,--retain-symbols-file=\"#{SYMFILE}\""
 end
 
 create_makefile 'pg_query/pg_query'
